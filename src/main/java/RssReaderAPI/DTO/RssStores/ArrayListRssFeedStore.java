@@ -1,7 +1,6 @@
 package RssReaderAPI.DTO.RssStores;
 
 import RssReaderAPI.DTO.RssDto;
-
 import java.util.ArrayList;
 import java.util.List;
 

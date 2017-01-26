@@ -1,7 +1,6 @@
 package RssReaderAPI.Exceptions;
 
 import RssReaderAPI.DTO.ErrorDto;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -15,8 +14,11 @@ public class FeedExceptionMapper implements ExceptionMapper<Exception>{
         Response.Status status;
         String message;
 
-        if(e instanceof FeedNotFoundException){
+        if(e instanceof ResourceNotFoundException){
             status = Response.Status.NOT_FOUND;
+            message = e.getMessage();
+        } else if(e instanceof BadRequestException) {
+            status = Response.Status.BAD_REQUEST;
             message = e.getMessage();
         } else {
             status = Response.Status.BAD_REQUEST;
