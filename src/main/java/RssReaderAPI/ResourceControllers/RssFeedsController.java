@@ -3,6 +3,7 @@ package RssReaderAPI.ResourceControllers;
 import RssReaderAPI.DTO.RssDto;
 import RssReaderAPI.DTO.RssFeedDto;
 import RssReaderAPI.Exceptions.BadRequestException;
+import RssReaderAPI.Exceptions.InternalServerError;
 import RssReaderAPI.Exceptions.ResourceNotFoundException;
 import RssReaderAPI.Services.RssFeedsService;
 import com.google.gson.GsonBuilder;
@@ -38,7 +39,7 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/")
-    public Response getNewsPage(@PathParam("feedId") long feedId, @QueryParam("start") long start, @QueryParam("end") long end) throws ResourceNotFoundException, BadRequestException {
+    public Response getNewsPage(@PathParam("feedId") long feedId, @QueryParam("start") long start, @QueryParam("end") long end) throws ResourceNotFoundException, BadRequestException, InternalServerError {
         List<RssDto> rssDtos;
         if(start == 0 && end == 0){
             rssDtos = rssFeedsService.getAllNews(feedId);
@@ -52,7 +53,7 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/{newsId}/")
-    public Response getSingleNews(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException {
+    public Response getSingleNews(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
         RssDto rssDto = rssFeedsService.getSingleNews(feedId, rssId);
         return Response.ok(rssDto).build();
     }
@@ -60,7 +61,7 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/{newsId}/statistics")
-    public Response getMostUsedWords(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException {
+    public Response getMostUsedWords(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
         int count = 5;
         String[] mostUsedWords = rssFeedsService.getMostUsedWords(feedId, rssId, count);
         String words = new GsonBuilder().create().toJson(mostUsedWords);

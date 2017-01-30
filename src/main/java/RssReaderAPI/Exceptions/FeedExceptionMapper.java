@@ -20,6 +20,9 @@ public class FeedExceptionMapper implements ExceptionMapper<Exception>{
         } else if(e instanceof BadRequestException) {
             status = Response.Status.BAD_REQUEST;
             message = e.getMessage();
+        } else if(e instanceof InternalServerError){
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+            message = e.getMessage();
         } else {
             status = Response.Status.BAD_REQUEST;
             message = "Bad Request";
