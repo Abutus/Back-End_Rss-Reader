@@ -1,5 +1,6 @@
 package rssreader.dao.impl;
 
+import com.sun.org.apache.bcel.internal.generic.Select;
 import rssreader.dao.RssFeedDAO;
 import rssreader.dto.RssFeedDto;
 import rssreader.util.HibernateUtil;
@@ -24,7 +25,7 @@ public class RssFeedDAOImpl implements RssFeedDAO {
         List<RssFeedDto> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             Query query = session.createQuery("FROM RssFeedDto WHERE rownum <= :endRow")
-                    .setInteger("endRow", end)
+                    .setParameter("endRow", end)
                     .setFirstResult(start);
             rssFeeds = query.list();
         }

@@ -5,7 +5,7 @@ import rssreader.dto.RssFeedDto;
 import rssreader.exceptions.BadRequestException;
 import rssreader.exceptions.InternalServerError;
 import rssreader.exceptions.ResourceNotFoundException;
-import rssreader.EntityFactory;
+import rssreader.DaoFactory;
 import rssreader.RssFeedSaxHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -28,13 +28,13 @@ public class RssFeedsService {
 
     public List<RssFeedDto> getAllFeeds() throws ResourceNotFoundException {
         List<RssFeedDto> rssFeeds;
-        rssFeeds = EntityFactory.getInstance().getRssFeedDAO().getAllFeeds();
+        rssFeeds = DaoFactory.getInstance().getRssFeedDAO().getAllFeeds();
         return rssFeeds;
     }
 
     public List<RssFeedDto> getFeedsByTitle(String title) throws ResourceNotFoundException {
         List<RssFeedDto> rssFeeds;
-        rssFeeds = EntityFactory.getInstance().getRssFeedDAO().getFeedsByTitle(title);
+        rssFeeds = DaoFactory.getInstance().getRssFeedDAO().getFeedsByTitle(title);
         return rssFeeds;
     }
 
@@ -44,7 +44,7 @@ public class RssFeedsService {
         } else if (end < start) {
             throw new BadRequestException("Index of the last element is less than index of the first element");
         }
-        return EntityFactory.getInstance().getRssFeedDAO().getFeedsPage((int)start, (int)end);
+        return DaoFactory.getInstance().getRssFeedDAO().getFeedsPage((int)start, (int)end);
     }
 
     public List<RssFeedDto> getFeedsPageByTitle(String title, long start, long end) throws ResourceNotFoundException, BadRequestException {
@@ -53,11 +53,11 @@ public class RssFeedsService {
         } else if (end < start) {
             throw new BadRequestException("Index of the last element is less than index of the first element");
         }
-        return EntityFactory.getInstance().getRssFeedDAO().getFeedsPageByTitle(title, (int)start, (int)end);
+        return DaoFactory.getInstance().getRssFeedDAO().getFeedsPageByTitle(title, (int)start, (int)end);
     }
 
     public List<RssDto> getAllNews(long feedId) throws ResourceNotFoundException, InternalServerError {
-        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
+        Optional<RssFeedDto> rssFeedDto = DaoFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
         if (!rssFeedDto.isPresent()) {
             throw new ResourceNotFoundException("Feeds with id : " + feedId + " not found. Can't get it!");
         }
@@ -131,24 +131,24 @@ public class RssFeedsService {
     }
 
     public void addFeed(RssFeedDto rssFeed){
-        EntityFactory.getInstance().getRssFeedDAO().addFeed(rssFeed);
+        DaoFactory.getInstance().getRssFeedDAO().addFeed(rssFeed);
     }
 
     public void updateFeed(RssFeedDto updatedRssFeed) throws ResourceNotFoundException {
-        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(updatedRssFeed.getId());
+        Optional<RssFeedDto> rssFeedDto = DaoFactory.getInstance().getRssFeedDAO().getFeedById(updatedRssFeed.getId());
         if (!rssFeedDto.isPresent()){
             throw new ResourceNotFoundException("Feed with id: " + updatedRssFeed.getId() + " not found. Can't retrieve it!");
         } else {
-            EntityFactory.getInstance().getRssFeedDAO().updateFeed(updatedRssFeed);
+            DaoFactory.getInstance().getRssFeedDAO().updateFeed(updatedRssFeed);
         }
     }
 
     public void deleteFeed(long feedId) throws ResourceNotFoundException {
-        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
+        Optional<RssFeedDto> rssFeedDto = DaoFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
         if (!rssFeedDto.isPresent()){
             throw new ResourceNotFoundException("Feed with id: " + feedId + " not found. Can't delete it!");
         } else {
-            EntityFactory.getInstance().getRssFeedDAO().deleteFeedById(feedId);
+            DaoFactory.getInstance().getRssFeedDAO().deleteFeedById(feedId);
         }
     }
 }

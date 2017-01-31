@@ -3,13 +3,13 @@ package rssreader;
 import rssreader.dao.RssFeedDAO;
 import rssreader.dao.impl.RssFeedDAOImpl;
 
-public class EntityFactory {
+public class DaoFactory {
     private static RssFeedDAO rssFeedDAO = null;
-    private static EntityFactory instance = null;
+    private static DaoFactory instance = null;
 
-    public static synchronized EntityFactory getInstance(){
+    public static synchronized DaoFactory getInstance(){
         if(instance == null){
-            instance = new EntityFactory();
+            instance = new DaoFactory();
         }
         return instance;
     }
