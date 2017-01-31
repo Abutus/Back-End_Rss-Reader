@@ -68,30 +68,80 @@ public class RssFeedDAOImpl implements RssFeedDAO {
 
     @Override
     public void addFeed(RssFeedDto rssFeedDto) {
-        try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            session.beginTransaction();
-            session.save(rssFeedDto);
-            session.getTransaction().commit();
-        }
+        DbOperation addOperation = new AddOperation(rssFeedDto);
+        addOperation.exec();
     }
 
     @Override
-    public void updateFeed(RssFeedDto rssFeed){
-        try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            session.beginTransaction();
-            session.update(rssFeed);
-            session.getTransaction().commit();
-        }
+    public void updateFeed(RssFeedDto rssFeedDto){
+        DbOperation updateOperation = new UpdateOperation(rssFeedDto);
+        updateOperation.exec();
     }
 
     @Override
     public void deleteFeedById(long id){
-        try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            session.beginTransaction();
+        DbOperation deleteOperation = new DeleteOperation(id);
+        deleteOperation.exec();
+    }
+
+    abstract class DbOperation{
+        void exec()
+        {
+            try(Session session = HibernateUtil.getSessionFactory().openSession())
+            {
+                session.beginTransaction();
+                performInTransaction(session);
+                session.getTransaction().commit();
+            }
+        }
+
+        abstract void performInTransaction(Session session);
+    }
+
+    class AddOperation extends DbOperation{
+        private RssFeedDto rssfeedDto;
+
+        AddOperation(RssFeedDto rssfeedDto)
+        {
+            this.rssfeedDto = rssfeedDto;
+        }
+
+        @Override
+        void performInTransaction(Session session)
+        {
+            session.save(rssfeedDto);
+        }
+    }
+
+    class UpdateOperation extends DbOperation {
+        private RssFeedDto rssfeedDto;
+
+        UpdateOperation(RssFeedDto rssfeedDto)
+        {
+            this.rssfeedDto = rssfeedDto;
+        }
+
+        @Override
+        void performInTransaction(Session session)
+        {
+            session.update(rssfeedDto);
+        }
+    }
+
+    class DeleteOperation extends DbOperation {
+        private long id;
+
+        DeleteOperation(long id)
+        {
+            this.id = id;
+        }
+
+        @Override
+        void performInTransaction(Session session)
+        {
             session.createQuery("DELETE FROM RssFeedDto " +
                     "WHERE feed_id = :feedId")
                     .setParameter("feedId", id).executeUpdate();
-            session.getTransaction().commit();
         }
     }
 }
