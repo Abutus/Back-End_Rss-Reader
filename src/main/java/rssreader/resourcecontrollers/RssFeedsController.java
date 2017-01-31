@@ -1,12 +1,12 @@
-package RssReaderAPI.ResourceControllers;
+package rssreader.resourcecontrollers;
 
-import RssReaderAPI.DTO.RssDto;
-import RssReaderAPI.DTO.RssFeedDto;
-import RssReaderAPI.Exceptions.BadRequestException;
-import RssReaderAPI.Exceptions.InternalServerError;
-import RssReaderAPI.Exceptions.ResourceNotFoundException;
-import RssReaderAPI.Services.RssFeedsService;
 import com.google.gson.GsonBuilder;
+import rssreader.dto.RssDto;
+import rssreader.dto.RssFeedDto;
+import rssreader.exceptions.BadRequestException;
+import rssreader.exceptions.InternalServerError;
+import rssreader.exceptions.ResourceNotFoundException;
+import rssreader.services.RssFeedsService;
 import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -63,8 +63,8 @@ public class RssFeedsController {
     @Path("{feedId}/news/{newsId}/statistics")
     public Response getMostUsedWords(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
         int count = 5;
-        String[] mostUsedWords = rssFeedsService.getMostUsedWords(feedId, rssId, count);
-        String words = new GsonBuilder().create().toJson(mostUsedWords);
+        List<String> mostUsedWords = rssFeedsService.getMostUsedWords(feedId, rssId, count);
+        String words = new GsonBuilder().create().toJson(mostUsedWords.toArray());
         return Response.ok(words).build();
     }
 
@@ -72,19 +72,19 @@ public class RssFeedsController {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addFeed(RssFeedDto rssFeedDto){
         rssFeedsService.addFeed(rssFeedDto);
-        return Response.ok().build();
+        return Response.status(Response.Status.CREATED).entity(rssFeedDto).build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateFeed(@QueryParam("ID") long feed_id, RssFeedDto rssFeed) throws ResourceNotFoundException {
-        rssFeedsService.updateFeed(feed_id, rssFeed);
+    public Response updateFeed(RssFeedDto rssFeed) throws ResourceNotFoundException {
+        rssFeedsService.updateFeed(rssFeed);
         return Response.ok().build();
     }
 
     @DELETE
-    public Response deleteFeed(@QueryParam("ID") long id) throws ResourceNotFoundException {
+    public Response deleteFeed(@QueryParam("id") long id) throws ResourceNotFoundException {
         rssFeedsService.deleteFeed(id);
-        return Response.ok().build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

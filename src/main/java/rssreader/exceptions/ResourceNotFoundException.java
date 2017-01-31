@@ -1,4 +1,4 @@
-package RssReaderAPI.Exceptions;
+package rssreader.exceptions;
 
 public class ResourceNotFoundException extends Exception{
 

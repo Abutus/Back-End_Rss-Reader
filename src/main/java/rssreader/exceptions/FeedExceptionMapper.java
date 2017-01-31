@@ -1,6 +1,6 @@
-package RssReaderAPI.Exceptions;
+package rssreader.exceptions;
 
-import RssReaderAPI.DTO.ErrorDto;
+import rssreader.dto.ErrorDto;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

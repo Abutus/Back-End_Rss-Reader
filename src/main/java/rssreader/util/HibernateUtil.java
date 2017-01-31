@@ -1,4 +1,4 @@
-package RssReaderAPI.Util;
+package rssreader.util;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

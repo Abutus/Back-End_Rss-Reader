@@ -1,15 +1,15 @@
-package RssReaderAPI;
+package rssreader;
 
-import RssReaderAPI.DAO.Impl.RssFeedDAOImpl;
-import RssReaderAPI.DAO.RssFeedDAO;
+import rssreader.dao.RssFeedDAO;
+import rssreader.dao.impl.RssFeedDAOImpl;
 
-public class Factory {
+public class EntityFactory {
     private static RssFeedDAO rssFeedDAO = null;
-    private static Factory instance = null;
+    private static EntityFactory instance = null;
 
-    public static synchronized Factory getInstance(){
+    public static synchronized EntityFactory getInstance(){
         if(instance == null){
-            instance = new Factory();
+            instance = new EntityFactory();
         }
         return instance;
     }

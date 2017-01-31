@@ -1,4 +1,4 @@
-package RssReaderAPI;
+package rssreader;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import javax.ws.rs.ApplicationPath;
@@ -7,6 +7,6 @@ import javax.ws.rs.ApplicationPath;
 public class ApplicationInitializer extends ResourceConfig{
 
     public ApplicationInitializer(){
-        packages("RssReaderAPI");
+        packages("rssreader");
     }
 }

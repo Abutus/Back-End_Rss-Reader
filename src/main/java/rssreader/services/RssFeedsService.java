@@ -1,12 +1,12 @@
-package RssReaderAPI.Services;
+package rssreader.services;
 
-import RssReaderAPI.DTO.RssDto;
-import RssReaderAPI.DTO.RssFeedDto;
-import RssReaderAPI.Exceptions.BadRequestException;
-import RssReaderAPI.Exceptions.InternalServerError;
-import RssReaderAPI.Exceptions.ResourceNotFoundException;
-import RssReaderAPI.Factory;
-import RssReaderAPI.RssFeedSaxHandler;
+import rssreader.dto.RssDto;
+import rssreader.dto.RssFeedDto;
+import rssreader.exceptions.BadRequestException;
+import rssreader.exceptions.InternalServerError;
+import rssreader.exceptions.ResourceNotFoundException;
+import rssreader.EntityFactory;
+import rssreader.RssFeedSaxHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,57 +27,37 @@ public class RssFeedsService {
     }
 
     public List<RssFeedDto> getAllFeeds() throws ResourceNotFoundException {
-        Optional<List<RssFeedDto>> rssFeeds;
-        rssFeeds = Factory.getInstance().getRssFeedDAO().getAllFeeds();
-        if (!rssFeeds.isPresent()) {
-            throw new ResourceNotFoundException("Feeds are not found. Can't get it!");
-        }
-        return rssFeeds.get();
+        List<RssFeedDto> rssFeeds;
+        rssFeeds = EntityFactory.getInstance().getRssFeedDAO().getAllFeeds();
+        return rssFeeds;
     }
 
     public List<RssFeedDto> getFeedsByTitle(String title) throws ResourceNotFoundException {
-        Optional<List<RssFeedDto>> rssFeeds;
-        rssFeeds = Factory.getInstance().getRssFeedDAO().getFeedsByTitle(title);
-        if (!rssFeeds.isPresent()){
-            throw new ResourceNotFoundException("Feeds with substring :\"" + title + "\" in title not found. Can't get it!");
-        }
-        return rssFeeds.get();
+        List<RssFeedDto> rssFeeds;
+        rssFeeds = EntityFactory.getInstance().getRssFeedDAO().getFeedsByTitle(title);
+        return rssFeeds;
     }
 
     public List<RssFeedDto> getFeedsPage(long start, long end) throws ResourceNotFoundException, BadRequestException {
-        ++end;
         if(start < 0) {
             throw new BadRequestException("Index of the first element is less than acceptable");
         } else if (end < start) {
             throw new BadRequestException("Index of the last element is less than index of the first element");
         }
-        List<RssFeedDto> rssFeeds = INSTANCE.getAllFeeds();
-        if(start > rssFeeds.size()) {
-            throw new BadRequestException("Index of the first element is more than acceptable");
-        } else if(end > rssFeeds.size()) {
-            throw new BadRequestException("Index of the last element is more than acceptable");
-        }
-        return rssFeeds.subList((int)start, (int)end);
+        return EntityFactory.getInstance().getRssFeedDAO().getFeedsPage((int)start, (int)end);
     }
 
     public List<RssFeedDto> getFeedsPageByTitle(String title, long start, long end) throws ResourceNotFoundException, BadRequestException {
-        ++end;
         if(start < 0) {
             throw new BadRequestException("Index of the first element is less than acceptable");
         } else if (end < start) {
             throw new BadRequestException("Index of the last element is less than index of the first element");
         }
-        List<RssFeedDto> rssFeeds = INSTANCE.getFeedsByTitle(title);
-        if(start > rssFeeds.size()) {
-            throw new BadRequestException("Index of the first element is more than acceptable");
-        } else if(end > rssFeeds.size()) {
-            throw new BadRequestException("Index of the last element is more than acceptable");
-        }
-        return rssFeeds.subList((int)start, (int)end);
+        return EntityFactory.getInstance().getRssFeedDAO().getFeedsPageByTitle(title, (int)start, (int)end);
     }
 
     public List<RssDto> getAllNews(long feedId) throws ResourceNotFoundException, InternalServerError {
-        Optional<RssFeedDto> rssFeedDto = Factory.getInstance().getRssFeedDAO().getFeedById(feedId);
+        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
         if (!rssFeedDto.isPresent()) {
             throw new ResourceNotFoundException("Feeds with id : " + feedId + " not found. Can't get it!");
         }
@@ -99,7 +79,6 @@ public class RssFeedsService {
     }
 
     public List<RssDto> getNewsPage(long feedId, long start, long end) throws ResourceNotFoundException, BadRequestException, InternalServerError {
-        ++end;
         if(start < 0) {
             throw new BadRequestException("Index of the first element is less than acceptable");
         } else if (end < start) {
@@ -124,47 +103,52 @@ public class RssFeedsService {
         return newsList.get((int)newsId);
     }
 
-    public String[] getMostUsedWords(long feedId, long rssId, int count) throws ResourceNotFoundException, InternalServerError {
+    public List<String> getMostUsedWords(long feedId, long rssId, int count) throws ResourceNotFoundException, InternalServerError {
         RssDto rssDto = INSTANCE.getSingleNews(feedId, rssId);
-        Map<String, Integer> map = new HashMap<>();
+
+        Map<String, Integer> numbersUsesOfWords = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(rssDto.getDescription(), " ,.:;!?\"\t\n");
         while (tokenizer.hasMoreTokens()){
             String token = tokenizer.nextToken();
-            Integer value = map.get(token);
+            Integer value = numbersUsesOfWords.get(token);
             if(value != null){
-                map.put(token, value + 1);
+                numbersUsesOfWords.put(token, value + 1);
             } else {
-                map.put(token, 1);
+                numbersUsesOfWords.put(token, 1);
             }
         }
-        List<Map.Entry<String, Integer>> list = new ArrayList(map.entrySet());
-        list.sort((o1, o2) -> o2.getValue() - o1.getValue());
-        String[] mostUsedWords = new String[count];
-        for(int i = 0; i < count; ++i){
-            mostUsedWords[i] = list.get(i).getKey();
+        List<Map.Entry<String, Integer>> listMapEntry = new ArrayList(numbersUsesOfWords.entrySet());
+        listMapEntry.sort((o1, o2) -> o2.getValue() - o1.getValue());
+
+        List<String> mostUsedWords = new ArrayList<>();
+        int wordsCount = 0;
+        Iterator<Map.Entry<String, Integer>> entryIterator = listMapEntry.iterator();
+        while (entryIterator.hasNext() && wordsCount < count){
+            mostUsedWords.add(entryIterator.next().getKey());
+            ++wordsCount;
         }
         return mostUsedWords;
     }
 
     public void addFeed(RssFeedDto rssFeed){
-        Factory.getInstance().getRssFeedDAO().addFeed(rssFeed);
+        EntityFactory.getInstance().getRssFeedDAO().addFeed(rssFeed);
     }
 
-    public void updateFeed(long feedId, RssFeedDto updatedRssFeed) throws ResourceNotFoundException {
-        Optional<RssFeedDto> rssFeedDto = Factory.getInstance().getRssFeedDAO().getFeedById(feedId);
+    public void updateFeed(RssFeedDto updatedRssFeed) throws ResourceNotFoundException {
+        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(updatedRssFeed.getId());
         if (!rssFeedDto.isPresent()){
-            throw new ResourceNotFoundException("Feed with id: " + feedId + " not found. Can't retrieve it!");
+            throw new ResourceNotFoundException("Feed with id: " + updatedRssFeed.getId() + " not found. Can't retrieve it!");
         } else {
-            Factory.getInstance().getRssFeedDAO().updateFeedById(feedId, updatedRssFeed);
+            EntityFactory.getInstance().getRssFeedDAO().updateFeed(updatedRssFeed);
         }
     }
 
     public void deleteFeed(long feedId) throws ResourceNotFoundException {
-        Optional<RssFeedDto> rssFeedDto = Factory.getInstance().getRssFeedDAO().getFeedById(feedId);
+        Optional<RssFeedDto> rssFeedDto = EntityFactory.getInstance().getRssFeedDAO().getFeedById(feedId);
         if (!rssFeedDto.isPresent()){
             throw new ResourceNotFoundException("Feed with id: " + feedId + " not found. Can't delete it!");
         } else {
-            Factory.getInstance().getRssFeedDAO().deleteFeedById(feedId);
+            EntityFactory.getInstance().getRssFeedDAO().deleteFeedById(feedId);
         }
     }
 }

@@ -1,8 +1,8 @@
-package RssReaderAPI;
+package rssreader;
 
-import RssReaderAPI.DTO.RssDto;
-import RssReaderAPI.DTO.RssStores.ArrayListRssFeedStore;
-import RssReaderAPI.DTO.RssStores.RssStore;
+import rssreader.dto.RssDto;
+import rssreader.dto.rssstores.ArrayListRssFeedStore;
+import rssreader.dto.rssstores.RssStore;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

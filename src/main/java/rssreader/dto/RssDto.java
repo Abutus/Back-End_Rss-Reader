@@ -1,4 +1,4 @@
-package RssReaderAPI.DTO;
+package rssreader.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.Instant;

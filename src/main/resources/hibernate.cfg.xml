@@ -12,6 +12,6 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
 
-        <mapping class="RssReaderAPI.DTO.RssFeedDto"/>
+        <mapping class="rssreader.dto.RssFeedDto"/>
     </session-factory>
 </hibernate-configuration>
