@@ -1,27 +1,25 @@
 package rssreader;
 
-import rssreader.dto.RssDto;
-import rssreader.dto.rssstores.ArrayListRssFeedStore;
-import rssreader.dto.rssstores.RssStore;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import rssreader.dto.RssFeedDto;
+import rssreader.dto.rssstores.ArrayListRssFeedStore;
+import rssreader.dto.rssstores.RssFeedStore;
 
-public class RssFeedSaxHandler extends DefaultHandler {
-
-    RssStore store = new ArrayListRssFeedStore();
-    RssDto currentRss;
+public class RssFeedSaxHandler extends DefaultHandler{
+    RssFeedStore store = new ArrayListRssFeedStore();
+    RssFeedDto currentRssFeed;
     String currentElement;
     StringBuffer currentCharacters;
 
     public RssFeedSaxHandler() {
-
     }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        if(qName.equalsIgnoreCase("item")) {
-            currentRss = new RssDto();
+        if(qName.equalsIgnoreCase("source")) {
+            currentRssFeed = new RssFeedDto();
         }
 
         currentElement = qName;
@@ -30,12 +28,9 @@ public class RssFeedSaxHandler extends DefaultHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if(currentRss != null && currentElement != null){
+        if(currentRssFeed != null && currentElement != null){
             if(currentElement.equalsIgnoreCase("title") ||
-                    currentElement.equalsIgnoreCase("link") ||
-                    currentElement.equalsIgnoreCase("description") ||
-                    currentElement.equalsIgnoreCase("guid") ||
-                    currentElement.equalsIgnoreCase("pubDate")){
+                    currentElement.equalsIgnoreCase("link")){
                 currentCharacters.append(ch, start, length);
             }
         }
@@ -43,24 +38,19 @@ public class RssFeedSaxHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if(qName.equalsIgnoreCase("item")){
-            store.add(currentRss);
+        if(qName.equalsIgnoreCase("source")){
+            store.add(currentRssFeed);
+            return;
         }
         if(currentElement != null && currentCharacters.length() > 0){
-            if(currentElement.equalsIgnoreCase("title"))
-                currentRss.setTitle(currentCharacters.toString());
-            if(currentElement.equalsIgnoreCase("link"))
-                currentRss.setLink(currentCharacters.toString());
-            if(currentElement.equalsIgnoreCase("description"))
-                currentRss.setDescription(currentCharacters.toString());
-            if(currentElement.equalsIgnoreCase("guid"))
-                currentRss.setGuid(currentCharacters.toString());
-            if(currentElement.equalsIgnoreCase("pubDate"))
-                currentRss.setPubDate(currentCharacters.toString());
+            if(qName.equalsIgnoreCase("title"))
+                currentRssFeed.setTitle(currentCharacters.toString());
+            if(qName.equalsIgnoreCase("link"))
+                currentRssFeed.setLink(currentCharacters.toString());
         }
     }
 
-    public RssStore getStore(){
+    public RssFeedStore getStore(){
         return store;
     }
 }

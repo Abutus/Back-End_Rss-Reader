@@ -1,18 +1,20 @@
 package rssreader.services;
 
+import rssreader.RssFeedSaxHandler;
 import rssreader.dto.RssDto;
 import rssreader.dto.RssFeedDto;
 import rssreader.exceptions.BadRequestException;
 import rssreader.exceptions.InternalServerError;
 import rssreader.exceptions.ResourceNotFoundException;
 import rssreader.DaoFactory;
-import rssreader.RssFeedSaxHandler;
+import rssreader.RssSaxHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
@@ -64,7 +66,7 @@ public class RssFeedsService {
         List<RssDto> rssDtos;
         try {
             SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-            RssFeedSaxHandler handler = new RssFeedSaxHandler();
+            RssSaxHandler handler = new RssSaxHandler();
             URL url = new URL(rssFeedDto.get().getLink());
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy01.merann.ru", 8080));
             URLConnection urlConnection = url.openConnection(proxy);
@@ -132,6 +134,22 @@ public class RssFeedsService {
 
     public void addFeed(RssFeedDto rssFeed){
         DaoFactory.getInstance().getRssFeedDAO().addFeed(rssFeed);
+    }
+
+    public List<RssFeedDto> addFeeds(InputStream inputStream) throws InternalServerError {
+        List<RssFeedDto> rssFeeds;
+        try {
+            SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+            RssFeedSaxHandler handler = new RssFeedSaxHandler();
+
+            saxParser.parse(new InputSource(inputStream), handler);
+            rssFeeds = handler.getStore().getRssFeedList();
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw  new InternalServerError(e.getMessage());
+        }
+        DaoFactory.getInstance().getRssFeedDAO().addFeeds(rssFeeds);
+
+        return rssFeeds;
     }
 
     public void updateFeed(RssFeedDto updatedRssFeed) throws ResourceNotFoundException {

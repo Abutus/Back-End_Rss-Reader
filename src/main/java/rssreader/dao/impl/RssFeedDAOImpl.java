@@ -1,6 +1,5 @@
 package rssreader.dao.impl;
 
-import com.sun.org.apache.bcel.internal.generic.Select;
 import rssreader.dao.RssFeedDAO;
 import rssreader.dto.RssFeedDto;
 import rssreader.util.HibernateUtil;
@@ -74,6 +73,12 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     @Override
+    public void addFeeds(List<RssFeedDto> rssFeedDtos){
+        DbOperation addListOperation = new AddListOperation(rssFeedDtos);
+        addListOperation.exec();
+    }
+
+    @Override
     public void updateFeed(RssFeedDto rssFeedDto){
         DbOperation updateOperation = new UpdateOperation(rssFeedDto);
         updateOperation.exec();
@@ -111,6 +116,27 @@ public class RssFeedDAOImpl implements RssFeedDAO {
         void performInTransaction(Session session)
         {
             session.save(rssfeedDto);
+        }
+    }
+
+    class AddListOperation extends DbOperation{
+        private List<RssFeedDto> rssFeedDtos;
+
+        AddListOperation(List<RssFeedDto> rssFeedDtos){
+            this.rssFeedDtos = rssFeedDtos;
+        }
+
+        @Override
+        void performInTransaction(Session session) {
+            int i = 0;
+            for (RssFeedDto rssFeed : rssFeedDtos){
+                session.save(rssFeed);
+                ++i;
+                if(i % 20 == 0){
+                    session.flush();
+                    session.clear();
+                }
+            }
         }
     }
 

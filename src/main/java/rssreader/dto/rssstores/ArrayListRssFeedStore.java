@@ -1,24 +1,25 @@
 package rssreader.dto.rssstores;
 
-import rssreader.dto.RssDto;
+import rssreader.dto.RssFeedDto;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayListRssFeedStore implements RssStore{
-    List<RssDto> RssList = new ArrayList<>();
+public class ArrayListRssFeedStore implements RssFeedStore{
+    List<RssFeedDto> RssFeedList = new ArrayList<>();
 
     @Override
     public void clear() {
-        RssList.clear();
+        RssFeedList.clear();
     }
 
     @Override
-    public void add(RssDto currentRss) {
-        RssList.add(currentRss);
+    public void add(RssFeedDto currentRssFeed) {
+        RssFeedList.add(currentRssFeed);
     }
 
     @Override
-    public List<RssDto> getRssList() {
-        return RssList;
+    public List<RssFeedDto> getRssFeedList() {
+        return RssFeedList;
     }
 }
