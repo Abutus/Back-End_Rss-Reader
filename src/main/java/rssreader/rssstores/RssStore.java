@@ -1,6 +1,7 @@
-package rssreader.dto.rssstores;
+package rssreader.rssstores;
 
 import rssreader.dto.RssDto;
+
 import java.util.List;
 
 public interface RssStore {

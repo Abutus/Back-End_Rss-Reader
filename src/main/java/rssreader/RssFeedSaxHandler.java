@@ -4,8 +4,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import rssreader.dto.RssFeedDto;
-import rssreader.dto.rssstores.ArrayListRssFeedStore;
-import rssreader.dto.rssstores.RssFeedStore;
+import rssreader.rssstores.impl.ArrayListRssFeedStore;
+import rssreader.rssstores.RssFeedStore;
 
 public class RssFeedSaxHandler extends DefaultHandler{
     RssFeedStore store = new ArrayListRssFeedStore();

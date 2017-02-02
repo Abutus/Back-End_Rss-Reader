@@ -1,18 +1,18 @@
 package rssreader.dao;
 
-import rssreader.dto.RssFeedDto;
+import rssreader.entity.RssFeedEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RssFeedDAO {
-    List<RssFeedDto> getAllFeeds();
-    List<RssFeedDto> getFeedsPage(int start, int end);
-    List<RssFeedDto> getFeedsByTitle(String title);
-    List<RssFeedDto> getFeedsPageByTitle(String title, int start, int end);
-    Optional<RssFeedDto> getFeedById(long id);
-    void addFeed(RssFeedDto rssFeedDto);
-    void addFeeds(List<RssFeedDto> rssFeedDtos);
-    void updateFeed(RssFeedDto rssFeedDto);
+    List<RssFeedEntity> getAllFeeds();
+    List<RssFeedEntity> getFeedsPage(int start, int end);
+    List<RssFeedEntity> getFeedsByTitle(String title);
+    List<RssFeedEntity> getFeedsPageByTitle(String title, int start, int end);
+    Optional<RssFeedEntity> getFeedById(long id);
+    void addFeed(RssFeedEntity rssFeed);
+    void addFeeds(List<RssFeedEntity> rssFeeds);
+    void updateFeed(RssFeedEntity rssFeed);
     void deleteFeedById(long id);
 }

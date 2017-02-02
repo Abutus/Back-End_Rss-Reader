@@ -1,11 +1,12 @@
-package rssreader.dto.rssstores;
+package rssreader.rssstores.impl;
 
 import rssreader.dto.RssFeedDto;
+import rssreader.rssstores.RssFeedStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayListRssFeedStore implements RssFeedStore{
+public class ArrayListRssFeedStore implements RssFeedStore {
     List<RssFeedDto> RssFeedList = new ArrayList<>();
 
     @Override

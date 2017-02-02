@@ -1,20 +1,41 @@
-package rssreader.dto;
+package rssreader.entity;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
+import javax.persistence.*;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-@XmlRootElement
-public class RssDto {
+@Entity
+@Table(schema = "RSSREADER", name = "News")
+public class RssEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feed_id", referencedColumnName = "feed_id")
+    private RssFeedEntity rssFeed;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "news_id", unique = true, nullable = false)
     private long id;
+    @Column(name = "news_title")
     private String title;
+    @Column(name = "news_link")
     private String link;
+    @Column(name = "news_description")
     private String description;
+    @Column(name = "news_guid")
     private String guid;
+    @Column(name = "news_pubDate")
     private Instant pubDate;
 
-    public RssDto() {
+    public RssEntity() {
+    }
+
+    public RssFeedEntity getRssFeed() {
+        return rssFeed;
+    }
+
+    public void setRssFeed(RssFeedEntity rssFeed) {
+        this.rssFeed = rssFeed;
     }
 
     public long getId() {

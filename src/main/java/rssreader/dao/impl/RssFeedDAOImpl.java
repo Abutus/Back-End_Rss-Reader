@@ -1,7 +1,7 @@
 package rssreader.dao.impl;
 
 import rssreader.dao.RssFeedDAO;
-import rssreader.dto.RssFeedDto;
+import rssreader.entity.RssFeedEntity;
 import rssreader.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -11,19 +11,20 @@ import java.util.Optional;
 public class RssFeedDAOImpl implements RssFeedDAO {
 
     @Override
-    public List<RssFeedDto> getAllFeeds() {
-        List<RssFeedDto> rssFeeds;
+    public List<RssFeedEntity> getAllFeeds() {
+        List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            rssFeeds = session.createQuery("FROM RssFeedDto").list();
+            Query query = session.createQuery("FROM RssFeedEntity");
+            rssFeeds = query.list();
         }
         return rssFeeds;
     }
 
     @Override
-    public List<RssFeedDto> getFeedsPage(int start, int end) {
-        List<RssFeedDto> rssFeeds;
+    public List<RssFeedEntity> getFeedsPage(int start, int end) {
+        List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssFeedDto WHERE rownum <= :endRow")
+            Query query = session.createQuery("FROM RssFeedEntity WHERE rownum <= :endRow")
                     .setParameter("endRow", end)
                     .setFirstResult(start);
             rssFeeds = query.list();
@@ -32,10 +33,10 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     @Override
-    public List<RssFeedDto> getFeedsByTitle(String title){
-        List<RssFeedDto> rssFeeds;
+    public List<RssFeedEntity> getFeedsByTitle(String title){
+        List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssFeedDto " +
+            Query query = session.createQuery("FROM RssFeedEntity " +
                     "WHERE lower(feed_title) LIKE lower(:searchTitle) " +
                     "ORDER BY feed_title ASC")
                     .setParameter("searchTitle", '%' + title + '%');
@@ -45,10 +46,10 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     @Override
-    public List<RssFeedDto> getFeedsPageByTitle(String title, int start, int end) {
-        List<RssFeedDto> rssFeeds;
+    public List<RssFeedEntity> getFeedsPageByTitle(String title, int start, int end) {
+        List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssFeedDto " +
+            Query query = session.createQuery("FROM RssFeedEntity " +
                     "WHERE lower(feed_title) LIKE lower( :searchTitle) AND rownum <= :endRow " +
                     "ORDER BY feed_title ASC")
                     .setParameter("searchTitle", '%' + title + '%')
@@ -60,27 +61,27 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     @Override
-    public Optional<RssFeedDto> getFeedById(long id) {
+    public Optional<RssFeedEntity> getFeedById(long id) {
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            return Optional.ofNullable(session.get(RssFeedDto.class, id));
+            return Optional.ofNullable(session.get(RssFeedEntity.class, id));
         }
     }
 
     @Override
-    public void addFeed(RssFeedDto rssFeedDto) {
-        DbOperation addOperation = new AddOperation(rssFeedDto);
+    public void addFeed(RssFeedEntity rssFeed) {
+        DbOperation addOperation = new AddOperation(rssFeed);
         addOperation.exec();
     }
 
     @Override
-    public void addFeeds(List<RssFeedDto> rssFeedDtos){
-        DbOperation addListOperation = new AddListOperation(rssFeedDtos);
+    public void addFeeds(List<RssFeedEntity> rssFeeds){
+        DbOperation addListOperation = new AddListOperation(rssFeeds);
         addListOperation.exec();
     }
 
     @Override
-    public void updateFeed(RssFeedDto rssFeedDto){
-        DbOperation updateOperation = new UpdateOperation(rssFeedDto);
+    public void updateFeed(RssFeedEntity rssFeed){
+        DbOperation updateOperation = new UpdateOperation(rssFeed);
         updateOperation.exec();
     }
 
@@ -91,8 +92,7 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     abstract class DbOperation{
-        void exec()
-        {
+        void exec() {
             try(Session session = HibernateUtil.getSessionFactory().openSession())
             {
                 session.beginTransaction();
@@ -105,31 +105,31 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     class AddOperation extends DbOperation{
-        private RssFeedDto rssfeedDto;
+        private RssFeedEntity rssFeed;
 
-        AddOperation(RssFeedDto rssfeedDto)
+        AddOperation(RssFeedEntity rssFeed)
         {
-            this.rssfeedDto = rssfeedDto;
+            this.rssFeed = rssFeed;
         }
 
         @Override
         void performInTransaction(Session session)
         {
-            session.save(rssfeedDto);
+            session.save(rssFeed);
         }
     }
 
     class AddListOperation extends DbOperation{
-        private List<RssFeedDto> rssFeedDtos;
+        private List<RssFeedEntity> rssFeeds;
 
-        AddListOperation(List<RssFeedDto> rssFeedDtos){
-            this.rssFeedDtos = rssFeedDtos;
+        AddListOperation(List<RssFeedEntity> rssFeeds){
+            this.rssFeeds = rssFeeds;
         }
 
         @Override
         void performInTransaction(Session session) {
             int i = 0;
-            for (RssFeedDto rssFeed : rssFeedDtos){
+            for (RssFeedEntity rssFeed : rssFeeds){
                 session.save(rssFeed);
                 ++i;
                 if(i % 20 == 0){
@@ -141,17 +141,17 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     }
 
     class UpdateOperation extends DbOperation {
-        private RssFeedDto rssfeedDto;
+        private RssFeedEntity rssFeed;
 
-        UpdateOperation(RssFeedDto rssfeedDto)
+        UpdateOperation(RssFeedEntity rssFeed)
         {
-            this.rssfeedDto = rssfeedDto;
+            this.rssFeed = rssFeed;
         }
 
         @Override
         void performInTransaction(Session session)
         {
-            session.update(rssfeedDto);
+            session.update(rssFeed);
         }
     }
 
@@ -166,7 +166,7 @@ public class RssFeedDAOImpl implements RssFeedDAO {
         @Override
         void performInTransaction(Session session)
         {
-            session.createQuery("DELETE FROM RssFeedDto " +
+            session.createQuery("DELETE FROM RssFeedEntity " +
                     "WHERE feed_id = :feedId")
                     .setParameter("feedId", id).executeUpdate();
         }
