@@ -24,7 +24,16 @@ public class RssDAOImpl implements RssDAO{
 
     @Override
     public List<RssEntity> getNewsPage(long feedId, int start, int end) {
-        return null;
+        List<RssEntity> news;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            Query query = session.createQuery("FROM RssEntity " +
+                    "WHERE feed_id = :feedId AND rownum <= :endRow")
+                    .setParameter("feedId", feedId)
+                    .setParameter("endRow", end)
+                    .setFirstResult(start);
+            news = query.list();
+        }
+        return news;
     }
 
     @Override
