@@ -5,6 +5,9 @@ import rssreader.entity.RssFeedEntity;
 import rssreader.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +27,12 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     public List<RssFeedEntity> getFeedsPage(int start, int end) {
         List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssFeedEntity WHERE rownum <= :endRow")
-                    .setParameter("endRow", end)
-                    .setFirstResult(start);
-            rssFeeds = query.list();
+            Query query = session.createNativeQuery("SELECT feedId, feedTitle, feedLink " +
+                    "FROM (SELECT ROWNUM rnum, feeds.FEED_ID as feedId, feeds.FEED_TITLE as feedTitle, feeds.FEED_LINK as feedLink " +
+                    "FROM RSSREADER.RSSFEEDS feeds " +
+                    "WHERE ROWNUM <= " + end + ") " +
+                    "WHERE rnum >= " + start);
+            rssFeeds = ConvertObjectList(query.list());
         }
         return rssFeeds;
     }
@@ -49,13 +54,13 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     public List<RssFeedEntity> getFeedsPageByTitle(String title, int start, int end) {
         List<RssFeedEntity> rssFeeds;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssFeedEntity " +
-                    "WHERE lower(feed_title) LIKE lower( :searchTitle) AND rownum <= :endRow " +
-                    "ORDER BY feed_title ASC")
-                    .setParameter("searchTitle", '%' + title + '%')
-                    .setInteger("endRow", end)
-                    .setFirstResult(start);
-            rssFeeds = query.list();
+            Query query = session.createNativeQuery("SELECT feedId, feedTitle, feedLink " +
+                    "FROM (SELECT ROWNUM rnum, feeds.FEED_ID as feedId, feeds.FEED_TITLE as feedTitle, feeds.FEED_LINK as feedLink " +
+                        "FROM RSSREADER.RSSFEEDS feeds " +
+                        "WHERE ROWNUM <= " + end + ") " +
+                    "WHERE rnum >= " + start + " AND lower(feedTitle) LIKE lower('%" + title + "%') " +
+                    "ORDER BY feedTitle ASC");
+            rssFeeds = ConvertObjectList(query.list());
         }
         return rssFeeds;
     }
@@ -89,6 +94,20 @@ public class RssFeedDAOImpl implements RssFeedDAO {
     public void deleteFeedById(long id){
         DbOperation deleteOperation = new DeleteOperation(id);
         deleteOperation.exec();
+    }
+
+    private List<RssFeedEntity> ConvertObjectList(List objectList){
+        List<RssFeedEntity> rssFeeds = new ArrayList<>();
+        for (Object obj : objectList){
+            Object[] entity = (Object[]) obj;
+            RssFeedEntity rssFeed = new RssFeedEntity();
+            BigDecimal feedId = (BigDecimal) entity[0];
+            rssFeed.setId(feedId.longValue());
+            rssFeed.setTitle((String)entity[1]);
+            rssFeed.setLink((String)entity[2]);
+            rssFeeds.add(rssFeed);
+        }
+        return rssFeeds;
     }
 
     abstract class DbOperation{
