@@ -1,9 +1,8 @@
 package rssreader.resourcecontrollers;
 
 import com.google.gson.GsonBuilder;
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import rssreader.dto.RssDto;
+import rssreader.dto.RssNewsItemDto;
 import rssreader.dto.RssFeedDto;
 import rssreader.exceptions.BadRequestException;
 import rssreader.exceptions.InternalServerError;
@@ -43,13 +42,13 @@ public class RssFeedsController {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/")
     public Response getNewsPage(@PathParam("feedId") long feedId, @QueryParam("start") long start, @QueryParam("end") long end) throws ResourceNotFoundException, BadRequestException, InternalServerError {
-        List<RssDto> rssDtos;
+        List<RssNewsItemDto> rssNewsItemDtos;
         if(start == 0 && end == 0){
-            rssDtos = rssFeedsService.getAllNews(feedId);
+            rssNewsItemDtos = rssFeedsService.getAllNews(feedId);
         } else {
-            rssDtos = rssFeedsService.getNewsPage(feedId, start, end);
+            rssNewsItemDtos = rssFeedsService.getNewsPage(feedId, start, end);
         }
-        GenericEntity<List<RssDto>> rss = new GenericEntity<List<RssDto>>(rssDtos){};
+        GenericEntity<List<RssNewsItemDto>> rss = new GenericEntity<List<RssNewsItemDto>>(rssNewsItemDtos){};
         return Response.ok(rss).build();
     }
 
@@ -57,8 +56,8 @@ public class RssFeedsController {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/{newsId}/")
     public Response getSingleNews(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
-        RssDto rssDto = rssFeedsService.getSingleNews(feedId, rssId);
-        return Response.ok(rssDto).build();
+        RssNewsItemDto rssNewsItemDto = rssFeedsService.getSingleNews(feedId, rssId);
+        return Response.ok(rssNewsItemDto).build();
     }
 
     @GET

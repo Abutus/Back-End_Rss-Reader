@@ -2,24 +2,23 @@ package rssreader.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import rssreader.dao.RssDAO;
-import rssreader.entity.RssEntity;
+import rssreader.dao.RssNewsDAO;
+import rssreader.entity.RssNewsItemEntity;
 import rssreader.util.HibernateUtil;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class RssDAOImpl implements RssDAO{
+public class RssNewsDAOImpl implements RssNewsDAO {
 
     @Override
-    public List<RssEntity> getAllNews(long feedId) {
-        List<RssEntity> news;
+    public List<RssNewsItemEntity> getAllNews(long feedId) {
+        List<RssNewsItemEntity> news;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssEntity WHERE feed_id = :feedId")
+            Query query = session.createQuery("FROM RssNewsItemEntity WHERE feed_id = :feedId")
                     .setParameter("feedId", feedId);
             news = query.list();
         }
@@ -27,31 +26,34 @@ public class RssDAOImpl implements RssDAO{
     }
 
     @Override
-    public List<RssEntity> getNewsPage(long feedId, int start, int end) {
-        List<RssEntity> news;
+    public List<RssNewsItemEntity> getNewsPage(long feedId, int start, int end) {
+        List<RssNewsItemEntity> news;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             Query query = session.createNativeQuery("SELECT newsId, newsTitle, newsLink, newsDescription, newsGuid, newsPubDate " +
                     "FROM (SELECT ROWNUM rnum, news.NEWS_ID as newsId, news.NEWS_TITLE as newsTitle, news.NEWS_LINK as newsLink, news.NEWS_DESCRIPTION as newsDescription, news.NEWS_GUID as newsGuid, news.NEWS_PUBDATE as newsPubDate " +
-                    "FROM (SELECT * FROM RSSREADER.NEWS WHERE FEED_ID = " + feedId + ") news " +
-                    "WHERE ROWNUM <= " + end + ") " +
-                    "WHERE rnum >= " + start);
-            news = ConvertObjectList(query.list());
+                        "FROM (SELECT * FROM RSSREADER.NEWS WHERE FEED_ID = :feedId) news " +
+                        "WHERE ROWNUM <= :end) " +
+                    "WHERE rnum >= :start")
+                    .setParameter("feedId", feedId)
+                    .setParameter("end", end)
+                    .setParameter("start", start);
+            news = createRssNewsFromSqlQueryResult(query.list());
         }
         return news;
     }
 
     @Override
-    public Optional<RssEntity> getNewsById(long id) {
+    public Optional<RssNewsItemEntity> getNewsById(long id) {
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            return Optional.ofNullable(session.get(RssEntity.class, id));
+            return Optional.ofNullable(session.get(RssNewsItemEntity.class, id));
         }
     }
 
-    private List<RssEntity> ConvertObjectList(List objectList){
-        List<RssEntity> rssFeeds = new ArrayList<>();
+    private List<RssNewsItemEntity> createRssNewsFromSqlQueryResult(List objectList){
+        List<RssNewsItemEntity> rssFeeds = new ArrayList<>();
         for (Object obj : objectList){
             Object[] entity = (Object[]) obj;
-            RssEntity news = new RssEntity();
+            RssNewsItemEntity news = new RssNewsItemEntity();
             BigDecimal newsId = (BigDecimal) entity[0];
             news.setId(newsId.longValue());
             news.setTitle((String)entity[1]);

@@ -1,12 +1,12 @@
 package rssreader.factory;
 
-import rssreader.dao.RssDAO;
+import rssreader.dao.RssNewsDAO;
 import rssreader.dao.RssFeedDAO;
-import rssreader.dao.impl.RssDAOImpl;
+import rssreader.dao.impl.RssNewsDAOImpl;
 import rssreader.dao.impl.RssFeedDAOImpl;
 
 public class DaoFactory {
-    private static RssDAO rssDAO = null;
+    private static RssNewsDAO rssDAO = null;
     private static RssFeedDAO rssFeedDAO = null;
 
     public static synchronized RssFeedDAO getRssFeedDAO(){
@@ -16,9 +16,9 @@ public class DaoFactory {
         return rssFeedDAO;
     }
 
-    public static synchronized RssDAO getRssDAO(){
+    public static synchronized RssNewsDAO getRssDAO(){
         if(rssDAO == null){
-            rssDAO = new RssDAOImpl();
+            rssDAO = new RssNewsDAOImpl();
         }
         return rssDAO;
     }

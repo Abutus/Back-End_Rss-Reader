@@ -1,26 +1,26 @@
 package rssreader;
 
-import rssreader.dto.RssDto;
-import rssreader.rssstores.impl.ArrayListRssStore;
-import rssreader.rssstores.RssStore;
+import rssreader.entity.RssNewsItemEntity;
+import rssreader.rssstores.impl.ArrayListRssNewsStore;
+import rssreader.rssstores.RssNewsStore;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class RssSaxHandler extends DefaultHandler {
+public class RssNewsSaxHandler extends DefaultHandler {
 
-    RssStore store = new ArrayListRssStore();
-    RssDto currentRss;
+    RssNewsStore store = new ArrayListRssNewsStore();
+    RssNewsItemEntity currentRss;
     String currentElement;
     StringBuffer currentCharacters;
 
-    public RssSaxHandler() {
+    public RssNewsSaxHandler() {
     }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if(qName.equalsIgnoreCase("item")) {
-            currentRss = new RssDto();
+            currentRss = new RssNewsItemEntity();
         }
 
         currentElement = qName;
@@ -59,7 +59,7 @@ public class RssSaxHandler extends DefaultHandler {
         }
     }
 
-    public RssStore getStore(){
+    public RssNewsStore getStore(){
         return store;
     }
 }
