@@ -19,7 +19,7 @@ public class RssFeedEntity {
     @Column(name = "lastUpdate")
     private Instant lastUpdate;
     @OneToMany(mappedBy = "rssFeed", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<RssEntity> news = new HashSet<>();
+    private Set<RssNewsItemEntity> news = new HashSet<>();
 
     public RssFeedEntity() {
     }
@@ -56,15 +56,15 @@ public class RssFeedEntity {
         this.lastUpdate = lastUpdate;
     }
 
-    public Set<RssEntity> getNews(){
+    public Set<RssNewsItemEntity> getNews(){
         return this.news;
     }
 
-    public void setNews(Set<RssEntity> news){
+    public void setNews(Set<RssNewsItemEntity> news){
         this.news = news;
     }
 
-    public void addNews(RssEntity news){
+    public void addNews(RssNewsItemEntity news){
         news.setRssFeed(this);
         this.news.add(news);
     }

@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 @XmlRootElement
-public class RssDto {
+public class RssNewsItemDto {
     private long id;
     private String title;
     private String link;
@@ -14,7 +14,7 @@ public class RssDto {
     private String guid;
     private Instant pubDate;
 
-    public RssDto() {
+    public RssNewsItemDto() {
     }
 
     public long getId() {

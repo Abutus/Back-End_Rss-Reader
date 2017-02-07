@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(schema = "RSSREADER", name = "News")
-public class RssEntity {
+public class RssNewsItemEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id", referencedColumnName = "feed_id")
     private RssFeedEntity rssFeed;
@@ -27,7 +27,7 @@ public class RssEntity {
     @Column(name = "news_pubDate")
     private Instant pubDate;
 
-    public RssEntity() {
+    public RssNewsItemEntity() {
     }
 
     public RssFeedEntity getRssFeed() {
