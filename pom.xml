@@ -68,6 +68,18 @@
             <artifactId>ojdbc7</artifactId>
             <version>12.1.0.2</version>
         </dependency>
+        <dependency>
+        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+        <artifactId>jersey-test-framework-provider-jetty</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -104,7 +116,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <parallel>methods</parallel>
+                    <threadCount>3</threadCount>
                 </configuration>
             </plugin>
         </plugins>

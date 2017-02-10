@@ -21,7 +21,8 @@ public class RssFeedsController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFeeds(@QueryParam("title") String title, @QueryParam("start") long start, @QueryParam("end") long end) throws ResourceNotFoundException, BadRequestException {
+    public Response getFeeds(@QueryParam("title") String title, @QueryParam("start") long start, @QueryParam("end") long end)
+            throws ResourceNotFoundException, BadRequestException {
         List<RssFeedDto> rssFeeds;
         if(title == null){
             if(start == 0 && end == 0) {
@@ -41,7 +42,8 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/")
-    public Response getNewsPage(@PathParam("feedId") long feedId, @QueryParam("start") long start, @QueryParam("end") long end) throws ResourceNotFoundException, BadRequestException, InternalServerError {
+    public Response getNewsPage(@PathParam("feedId") long feedId, @QueryParam("start") long start, @QueryParam("end") long end)
+            throws ResourceNotFoundException, BadRequestException, InternalServerError {
         List<RssNewsItemDto> rssNewsItemDtos;
         if(start == 0 && end == 0){
             rssNewsItemDtos = rssFeedsService.getAllNews(feedId);
@@ -55,7 +57,8 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/{newsId}/")
-    public Response getSingleNews(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
+    public Response getSingleNews(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId)
+            throws ResourceNotFoundException, InternalServerError {
         RssNewsItemDto rssNewsItemDto = rssFeedsService.getSingleNews(feedId, rssId);
         return Response.ok(rssNewsItemDto).build();
     }
@@ -63,7 +66,8 @@ public class RssFeedsController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{feedId}/news/{newsId}/statistics")
-    public Response getMostUsedWords(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId) throws ResourceNotFoundException, InternalServerError {
+    public Response getMostUsedWords(@PathParam("feedId") long feedId, @PathParam("newsId") long rssId)
+            throws ResourceNotFoundException, InternalServerError {
         int count = 5;
         List<String> mostUsedWords = rssFeedsService.getMostUsedWords(feedId, rssId, count);
         String words = new GsonBuilder().create().toJson(mostUsedWords.toArray());

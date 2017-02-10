@@ -8,6 +8,6 @@ public class ApplicationInitializer extends ResourceConfig{
 
     public ApplicationInitializer(){
         packages("rssreader");
-        register(AuthenticationFailter.class);
+        register(AuthenticationFilter.class);
     }
 }

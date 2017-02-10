@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @Provider
-public class AuthenticationFailter implements ContainerRequestFilter{
+public class AuthenticationFilter implements ContainerRequestFilter{
     @Context
     private ResourceInfo resourceInfo;
 
