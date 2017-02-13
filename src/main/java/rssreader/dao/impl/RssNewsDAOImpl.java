@@ -18,7 +18,8 @@ public class RssNewsDAOImpl implements RssNewsDAO {
     public List<RssNewsItemEntity> getAllNews(long feedId) {
         List<RssNewsItemEntity> news;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            Query query = session.createQuery("FROM RssNewsItemEntity WHERE feed_id = :feedId")
+            Query query = session.createQuery("FROM RssNewsItemEntity " +
+                    "WHERE feed_id = :feedId")
                     .setParameter("feedId", feedId);
             news = query.list();
         }
@@ -46,6 +47,17 @@ public class RssNewsDAOImpl implements RssNewsDAO {
     public Optional<RssNewsItemEntity> getNewsById(long id) {
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             return Optional.ofNullable(session.get(RssNewsItemEntity.class, id));
+        }
+    }
+
+    @Override
+    public void deleteNewsByFeedId(long feedId){
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            session.beginTransaction();
+            session.createQuery("DELETE FROM RssNewsItemEntity " +
+                    "WHERE feed_id = :feedId")
+                    .setParameter("feedId", feedId).executeUpdate();
+            session.getTransaction().commit();
         }
     }
 

@@ -5,7 +5,6 @@ import rssreader.dao.impl.RssFeedDAOImpl;
 import rssreader.entity.RssFeedEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 import static junit.framework.TestCase.assertNotNull;
 
