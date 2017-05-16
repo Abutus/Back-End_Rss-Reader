@@ -23,9 +23,9 @@ public class RssFeedEntityFactory {
         return rssFeedEntity;
     }
 
-    public List<RssFeedEntity> getRssFeedEntityList(List<RssFeedDto> dtos){
+    public List<RssFeedEntity> createRssFeedEntityList(List<RssFeedDto> dtos){
         List<RssFeedEntity> rssFeedEntities = new ArrayList<>();
-        dtos.stream().forEach(dto -> rssFeedEntities.add(createRssFeedEntity(dto)));
+        dtos.forEach(dto -> rssFeedEntities.add(createRssFeedEntity(dto)));
         return rssFeedEntities;
     }
 }

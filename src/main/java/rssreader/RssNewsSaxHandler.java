@@ -9,12 +9,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class RssNewsSaxHandler extends DefaultHandler {
 
-    RssNewsStore store = new ArrayListRssNewsStore();
-    RssNewsItemEntity currentRss;
-    String currentElement;
-    StringBuffer currentCharacters;
+    private RssNewsStore store = new ArrayListRssNewsStore();
+    private RssNewsItemEntity currentRss;
+    private String currentElement;
+    private StringBuffer currentCharacters;
 
-    public RssNewsSaxHandler() {
+    RssNewsSaxHandler() {
     }
 
     @Override

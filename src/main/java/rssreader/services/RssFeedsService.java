@@ -131,7 +131,7 @@ public class RssFeedsService {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw  new InternalServerError(e.getMessage());
         }
-        DaoFactory.getRssFeedDAO().addFeeds(RssFeedEntityFactory.getInstance().getRssFeedEntityList(rssFeeds));
+        DaoFactory.getRssFeedDAO().addFeeds(RssFeedEntityFactory.getInstance().createRssFeedEntityList(rssFeeds));
         return rssFeeds;
     }
 

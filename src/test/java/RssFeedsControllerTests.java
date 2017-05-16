@@ -22,6 +22,13 @@ public class RssFeedsControllerTests extends JerseyTest {
     }
 
     @Test
+    public void testGetBadRequestException() {
+        Response output = target("/RssFeeds/bad_url_address").request().get();
+        assertEquals("Should return status 400", 400, output.getStatus());
+        assertEquals("Should return JSON", MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
+    }
+
+    @Test
     public void testGetAllFeeds() {
         Response output = target("/RssFeeds/feeds/").request().get();
         assertEquals("Should return status 200", 200, output.getStatus());
@@ -35,11 +42,13 @@ public class RssFeedsControllerTests extends JerseyTest {
         assertEquals("Should return status 200", 200, output.getStatus());
         assertEquals("Should return JSON", MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertNotNull("Should return list", output.getEntity());
-    }
 
-    @Test()
-    public void testGetFeedsPageWithException() {
-        Response output = target("/RssFeeds/feeds/").queryParam("start", -1).queryParam("end", 5).request().get();
+
+        output = target("/RssFeeds/feeds/").queryParam("start", -1).queryParam("end", 5).request().get();
+        assertEquals("Should return status 400", 400, output.getStatus());
+        assertNull("Should not return list", output.getEntity());
+
+        output = target("/RssFeeds/feeds/").queryParam("start", 3).queryParam("end", 2).request().get();
         assertEquals("Should return status 400", 400, output.getStatus());
         assertNull("Should not return list", output.getEntity());
     }
@@ -58,13 +67,12 @@ public class RssFeedsControllerTests extends JerseyTest {
         assertEquals("Should return status 200", 200, output.getStatus());
         assertEquals("Should return JSON", MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertNotNull("Should return list", output.getEntity());
-    }
 
+        output = target("/RssFeeds/feeds/").queryParam("title", "zEt2").queryParam("start", -1).queryParam("end", 5).request().get();
+        assertEquals("Should return status 400", 400, output.getStatus());
+        assertNull("Should not return list", output.getEntity());
 
-
-    @Test
-    public void testGetFeedsPageByTitleWithException() {
-        Response output = target("/RssFeeds/feeds/").queryParam("title", "zEt2").queryParam("start", 2).queryParam("end", 1).request().get();
+        output = target("/RssFeeds/feeds/").queryParam("title", "zEt2").queryParam("start", 3).queryParam("end", 2).request().get();
         assertEquals("Should return status 400", 400, output.getStatus());
         assertNull("Should not return list", output.getEntity());
     }
@@ -83,11 +91,12 @@ public class RssFeedsControllerTests extends JerseyTest {
         assertEquals("Should return status 200", 200, output.getStatus());
         assertEquals("Should return JSON", MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertNotNull("Should return list", output.getEntity());
-    }
 
-    @Test
-    public void testGetNewsPageWithException() {
-        Response output = target("/RssFeeds/feeds/1/news/").queryParam("start", 2).queryParam("end", 1).request().get();
+        output = target("/RssFeeds/feeds/1/news/").queryParam("start", -1).queryParam("end", 5).request().get();
+        assertEquals("Should return status 400", 400, output.getStatus());
+        assertNull("Should not return list", output.getEntity());
+
+        output = target("/RssFeeds/feeds/1/news/").queryParam("start", 3).queryParam("end", 2).request().get();
         assertEquals("Should return status 400", 400, output.getStatus());
         assertNull("Should not return list", output.getEntity());
     }
@@ -98,12 +107,12 @@ public class RssFeedsControllerTests extends JerseyTest {
         assertEquals("Should return status 200", 200, output.getStatus());
         assertEquals("Should return JSON", MediaType.APPLICATION_JSON_TYPE, output.getMediaType());
         assertNotNull("Should return item", output.getEntity());
-    }
 
+        output = target("/RssFeeds/feeds/-1/news/1/").request().get();
+        assertEquals("Should return status 404", 404, output.getStatus());
+        assertNull("Should not return item", output.getEntity());
 
-    @Test
-    public void testGetSingleNewsWithException() {
-        Response output = target("/RssFeeds/feeds/1/news/0/").request().get();
+        output = target("/RssFeeds/feeds/1/news/0/").request().get();
         assertEquals("Should return status 404", 404, output.getStatus());
         assertNull("Should not return item", output.getEntity());
     }

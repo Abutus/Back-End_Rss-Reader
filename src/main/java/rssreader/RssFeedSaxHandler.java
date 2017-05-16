@@ -8,10 +8,10 @@ import rssreader.rssstores.impl.ArrayListRssFeedStore;
 import rssreader.rssstores.RssFeedStore;
 
 public class RssFeedSaxHandler extends DefaultHandler{
-    RssFeedStore store = new ArrayListRssFeedStore();
-    RssFeedDto currentRssFeed;
-    String currentElement;
-    StringBuffer currentCharacters;
+    private RssFeedStore store = new ArrayListRssFeedStore();
+    private RssFeedDto currentRssFeed;
+    private String currentElement;
+    private StringBuffer currentCharacters;
 
     public RssFeedSaxHandler() {
     }

@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 public class RssNewsUpdater implements Callable<Boolean>{
     private RssFeedEntity feedEntity;
 
-    public RssNewsUpdater(RssFeedEntity feedEntity) {
+    RssNewsUpdater(RssFeedEntity feedEntity) {
         this.feedEntity = feedEntity;
     }
 
