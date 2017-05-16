@@ -24,8 +24,8 @@ public class FeedExceptionMapper implements ExceptionMapper<Exception>{
             status = Response.Status.INTERNAL_SERVER_ERROR;
             message = e.getMessage();
         } else {
-            status = Response.Status.BAD_REQUEST;
-            message = "Bad Request";
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+            message = e.getMessage();
         }
 
         ErrorDto errorDto = new ErrorDto(status.getStatusCode(), message);

@@ -1,29 +1,49 @@
-package rssreader.dto;
+package rssreader.entity;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
+import javax.persistence.*;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-@XmlRootElement
-public class RssDto {
+@Entity
+@Table(schema = "RSSREADER", name = "News")
+public class RssNewsItemEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "feed_id", referencedColumnName = "feed_id")
+    private RssFeedEntity rssFeed;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "news_id", unique = true, nullable = false)
+    private long id;
+    @Column(name = "news_title")
     private String title;
+    @Column(name = "news_link")
     private String link;
+    @Column(name = "news_description")
     private String description;
+    @Column(name = "news_guid")
     private String guid;
+    @Column(name = "news_pubDate")
     private Instant pubDate;
 
-    public RssDto() {
+    public RssNewsItemEntity() {
     }
 
-    public RssDto(String title, String link, String description, String guid, String pubDate) {
-        this.title = title;
-        this.link = link;
-        this.description = description;
-        this.guid = guid;
-        DateTimeFormatter formatter = DateTimeFormatter.RFC_1123_DATE_TIME;
-        Instant dateTime = OffsetDateTime.parse(pubDate, formatter).toInstant();
-        this.pubDate = dateTime;
+    public RssFeedEntity getRssFeed() {
+        return rssFeed;
+    }
+
+    public void setRssFeed(RssFeedEntity rssFeed) {
+        this.rssFeed = rssFeed;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -58,8 +78,12 @@ public class RssDto {
         this.guid = guid;
     }
 
-    public String getPubDate() {
-        return pubDate.toString();
+    public Instant getPubDate() {
+        return pubDate;
+    }
+
+    public void setPubDate(Instant pubDate) {
+        this.pubDate = pubDate;
     }
 
     public void setPubDate(String pubDate) {
