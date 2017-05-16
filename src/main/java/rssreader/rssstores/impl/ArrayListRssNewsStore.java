@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayListRssNewsStore implements RssNewsStore {
-    List<RssNewsItemEntity> RssList = new ArrayList<>();
+    private List<RssNewsItemEntity> RssList = new ArrayList<>();
 
     @Override
     public void clear() {

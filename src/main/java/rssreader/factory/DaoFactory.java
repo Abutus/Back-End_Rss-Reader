@@ -16,7 +16,7 @@ public class DaoFactory {
         return rssFeedDAO;
     }
 
-    public static synchronized RssNewsDAO getRssDAO(){
+    public static synchronized RssNewsDAO getRssNewsDAO(){
         if(rssDAO == null){
             rssDAO = new RssNewsDAOImpl();
         }

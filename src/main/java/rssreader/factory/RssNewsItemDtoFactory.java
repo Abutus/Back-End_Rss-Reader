@@ -31,7 +31,7 @@ public class RssNewsItemDtoFactory {
 
     public List<RssNewsItemDto> createRssNewsItemDtoList(List<RssNewsItemEntity> entities){
         List<RssNewsItemDto> rssNewsItemDtos = new ArrayList<>();
-        entities.stream().forEach(entity -> rssNewsItemDtos.add(createRssNewsItemDto(entity)));
+        entities.forEach(entity -> rssNewsItemDtos.add(createRssNewsItemDto(entity)));
         return rssNewsItemDtos;
     }
 }

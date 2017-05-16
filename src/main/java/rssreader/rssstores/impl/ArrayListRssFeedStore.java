@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayListRssFeedStore implements RssFeedStore {
-    List<RssFeedDto> RssFeedList = new ArrayList<>();
+    private List<RssFeedDto> RssFeedList = new ArrayList<>();
 
     @Override
     public void clear() {

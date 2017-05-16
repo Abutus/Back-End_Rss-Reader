@@ -9,7 +9,6 @@ import rssreader.exceptions.BadRequestException;
 import rssreader.exceptions.InternalServerError;
 import rssreader.exceptions.ResourceNotFoundException;
 import rssreader.factory.DaoFactory;
-import rssreader.RssNewsSaxHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import rssreader.factory.RssFeedDtoFactory;
@@ -20,12 +19,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
-import java.time.Clock;
-import java.time.Instant;
 import java.util.*;
 
 public class RssFeedsService {
@@ -70,11 +63,7 @@ public class RssFeedsService {
         if (!rssFeed.isPresent()) {
             throw new ResourceNotFoundException("Feeds with id : " + feedId + " not found. Can't get it!");
         }
-        Instant now = Clock.systemDefaultZone().instant();
-        if(rssFeed.get().getLastUpdate() == null || (now.getEpochSecond() - rssFeed.get().getLastUpdate().getEpochSecond() > 600)){
-            updateNews(rssFeed.get());
-        }
-        List<RssNewsItemEntity> news = DaoFactory.getRssDAO().getAllNews(rssFeed.get().getId());
+        List<RssNewsItemEntity> news = DaoFactory.getRssNewsDAO().getAllNews(rssFeed.get().getId());
         return RssNewsItemDtoFactory.getInstance().createRssNewsItemDtoList(news);
     }
 
@@ -88,16 +77,12 @@ public class RssFeedsService {
         if (!rssFeed.isPresent()) {
             throw new ResourceNotFoundException("Feeds with id : " + feedId + " not found. Can't get it!");
         }
-        Instant now = Clock.systemDefaultZone().instant();
-        if(rssFeed.get().getLastUpdate() == null || (now.getEpochSecond() - rssFeed.get().getLastUpdate().getEpochSecond() > 6000)){
-            updateNews(rssFeed.get());
-        }
-        List<RssNewsItemEntity> newsList = DaoFactory.getRssDAO().getNewsPage(feedId, (int)start, (int)end);
+        List<RssNewsItemEntity> newsList = DaoFactory.getRssNewsDAO().getNewsPage(feedId, (int)start, (int)end);
         return RssNewsItemDtoFactory.getInstance().createRssNewsItemDtoList(newsList);
     }
 
     public RssNewsItemDto getSingleNews(long feedId, long newsId) throws ResourceNotFoundException, InternalServerError {
-        Optional<RssNewsItemEntity> news = DaoFactory.getRssDAO().getNewsById(newsId);
+        Optional<RssNewsItemEntity> news = DaoFactory.getRssNewsDAO().getNewsById(newsId);
         if(!news.isPresent()) {
             throw new ResourceNotFoundException("News with id : " + newsId + " not found in feed with id: " + feedId + ". Can't get it!");
         }
@@ -146,7 +131,7 @@ public class RssFeedsService {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw  new InternalServerError(e.getMessage());
         }
-        DaoFactory.getRssFeedDAO().addFeeds(RssFeedEntityFactory.getInstance().getRssFeedEntityList(rssFeeds));
+        DaoFactory.getRssFeedDAO().addFeeds(RssFeedEntityFactory.getInstance().createRssFeedEntityList(rssFeeds));
         return rssFeeds;
     }
 
@@ -166,28 +151,5 @@ public class RssFeedsService {
         } else {
             DaoFactory.getRssFeedDAO().deleteFeedById(feedId);
         }
-    }
-
-    public void updateNews(RssFeedEntity feedEntity) throws InternalServerError {
-        List<RssNewsItemEntity> news;
-        try {
-            SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-            RssNewsSaxHandler handler = new RssNewsSaxHandler();
-            URL url = new URL(feedEntity.getLink());
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy01.merann.ru", 8080));
-            URLConnection urlConnection = url.openConnection(proxy);
-            urlConnection.connect();
-
-            saxParser.parse(new InputSource(urlConnection.getInputStream()), handler);
-            news = handler.getStore().getRssList();
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw  new InternalServerError(e.getMessage());
-        }
-        for(RssNewsItemEntity newsEntity : news){
-            feedEntity.addNews(newsEntity);
-        }
-        Instant now = Clock.systemDefaultZone().instant();
-        feedEntity.setLastUpdate(now);
-        DaoFactory.getRssFeedDAO().updateFeed(feedEntity);
     }
 }
